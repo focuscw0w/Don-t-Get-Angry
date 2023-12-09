@@ -2,11 +2,17 @@ import random
 
 def najdi_poziciu_hraca(sachovnica, hrac):
     suradnice = ["", ""]
-    for i, riadok in enumerate(sachovnica):
+    for i in range(len(sachovnica)):
+        riadok = sachovnica[i]
         if hrac in riadok:
             suradnice[0] = i
             suradnice[1] = riadok.index(hrac)
     return suradnice
+
+def krok_y(pozicia_hraca, zaciatok_ramena):
+    if pozicia_hraca[1] > zaciatok_ramena + 1:
+        return 1
+    return - 1
 
 def gensachovnicu(n):
     # Kotrola -> vstup nesmie byť párne číslo
@@ -34,7 +40,7 @@ def gensachovnicu(n):
         sachovnica[sirka_ramena + 1][i] = "D"
 
     sachovnica[sirka_ramena + 1][sirka_ramena + 1] = "X"
-
+    
     for i in range(sirka_ramena):
         # X
         sachovnica[sirka_ramena][i + 1] = "*"
@@ -64,26 +70,52 @@ def gensachovnicu(n):
     # Nastavenie pozície hráča
     sachovnica[1][sirka_ramena + 3] = "A"
     suradnica_pred_domcekom = sachovnica[1].index(sachovnica[1][sirka_ramena + 2])
-    pozicia_pred_domcekom = sachovnica[1][suradnica_pred_domcekom]
-
+    pozicia_pred_domcekom = [1, suradnica_pred_domcekom]
+    print(len(sachovnica) // 2)
+    
+    #for i in range(12):
     # Simulácia pohybu - TODO: Spraviť funkciu
     hod_kockou = random.randint(1, 6)
-    hod_kockou = 8
     print(f"Hráč hodil číslo {hod_kockou}")
     print("\n")
+    hod_kockou = 31
     
     for i in range(hod_kockou):
-        pozicia_hraca = najdi_poziciu_hraca(sachovnica, "A")
-        sachovnica[pozicia_hraca[0]][pozicia_hraca[1]] = "*"
+            pozicia_hraca = najdi_poziciu_hraca(sachovnica, "A")
+            
+            test = 4
+            if pozicia_hraca == pozicia_pred_domcekom and test < (len(sachovnica) - 1) // 2:
+                sachovnica[pozicia_hraca[0] + test][pozicia_hraca[1] + 1] = "A"
+                sachovnica[pozicia_pred_domcekom[0]][pozicia_pred_domcekom[1]] = "*"
+                break
 
-        # Kam má hráč zabočiť
-        if sachovnica[pozicia_hraca[0] + 1][pozicia_hraca[1]] == "D" and sachovnica[pozicia_hraca[0]][pozicia_hraca[1] + 1] == "*":
-            sachovnica[pozicia_hraca[0]][pozicia_hraca[1] + 1] = "A" 
-        
-        elif sachovnica[pozicia_hraca[0] + 1][pozicia_hraca[1]] == "*":
-            sachovnica[pozicia_hraca[0] + 1][pozicia_hraca[1]] = "A"
-       
-        # TODO: Ak je nad hráčom domček, ide doľava
+            sachovnica[pozicia_hraca[0]][pozicia_hraca[1]] = "*"
+            krok = krok_y(pozicia_hraca, sirka_ramena + 1)
+                
+            if sachovnica[pozicia_hraca[0]] != sachovnica[-1] and pozicia_hraca[1] > sirka_ramena + 1:
+            # Kam má hráč zabočiť
+                if sachovnica[pozicia_hraca[0] + krok][pozicia_hraca[1]] == "D":
+                    sachovnica[pozicia_hraca[0]][pozicia_hraca[1] + krok] = "A" 
+
+                elif sachovnica[pozicia_hraca[0] + krok][pozicia_hraca[1]] == "*":
+                    sachovnica[pozicia_hraca[0] + krok][pozicia_hraca[1]] = "A"
+                
+                elif sachovnica[pozicia_hraca[0] - 1][pozicia_hraca[1]] == "*" and sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] == "*":
+                    sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] = "A"
+
+                else:
+                    sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] = "A"
+
+            elif sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] == "*" and sachovnica[pozicia_hraca[0]] == sachovnica[-1]:
+                sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] = "A"
+
+            elif sachovnica[pozicia_hraca[0] - 1][pozicia_hraca[1]] == "*":
+                sachovnica[pozicia_hraca[0] - 1][pozicia_hraca[1]] = "A"
+            
+            elif sachovnica[pozicia_hraca[0] - 1][pozicia_hraca[1]] == "D":
+                sachovnica[pozicia_hraca[0]][pozicia_hraca[1] - 1] = "A"
+            else:
+                sachovnica[pozicia_hraca[0]][pozicia_hraca[1] + 1] = "A"
 
     return sachovnica
 
@@ -96,4 +128,6 @@ velkost_sachovnice = int(input("Zadajte veľkosť šachovnice: "))
 dokoncena_sachovnica = gensachovnicu(velkost_sachovnice)
 tlacsachovnicu(dokoncena_sachovnica)
 
-    
+def simulacia_pohybu():
+    while True:
+        tlacsachovnicu(dokoncena_sachovnica)
